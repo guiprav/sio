@@ -10,19 +10,12 @@ if(!url) {
     process.exit(-1);
 }
 
-let eventNames = process.argv.slice(3);
-
-if(eventNames.length === 0) {
-    console.error("Missing event names.");
-    process.exit(-1);
-}
-
 let server = io.connect(url);
 
-eventNames.forEach(function(eventName) {
-    server.on(eventName, function(data) {
-        console.log(eventName, JSON.stringify(data));
-    });
+require('socketio-wildcard')(io.Manager)(server);
+
+server.on('*', function(message) {
+    console.log(message.data[0], JSON.stringify(message.data[1]));
 });
 
 server.on('disconnect', function() {
